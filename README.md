@@ -14,7 +14,10 @@ Employee Database
 ```
 npm install
 brew services start mongodb
+
+# run the app
 npm start
+
 brew services stop mongodb
 ```
 
