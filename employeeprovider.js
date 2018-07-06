@@ -5,93 +5,95 @@ var BSON = require('mongodb').BSON;
 var ObjectID = require('mongodb').ObjectID;
 
 EmployeeProvider = function(host, port) {
-  this.db= new Db('node-mongo-employee', new Server(host, port, {safe: false}, {auto_reconnect: true}, {}));
-  this.db.open(function(){});
+  this.db = new Db('node-mongo-employee',
+            new Server(host, port, {safe: false}, {auto_reconnect: true}, {}));
+  this.db.open(() => {});
 };
 
 
-EmployeeProvider.prototype.getCollection= function(callback) {
+EmployeeProvider.prototype.getCollection = function(callback) {
   this.db.collection('employees', function(error, employee_collection) {
-    if( error ) callback(error);
+    if (error) callback(error);
     else callback(null, employee_collection);
   });
 };
 
-//find all employees
+// find all employees
 EmployeeProvider.prototype.findAll = function(callback) {
-    this.getCollection(function(error, employee_collection) {
-      if( error ) callback(error)
-      else {
-        employee_collection.find().toArray(function(error, results) {
-          if( error ) callback(error)
-          else callback(null, results)
-        });
-      }
-    });
+  this.getCollection(function(error, employee_collection) {
+    if (error) callback(error)
+    else {
+      employee_collection.find().toArray((error, results) => {
+        if (error) callback(error);
+        else callback(null, results);
+      });
+    }
+  });
 };
 
-//find an employee by ID
+// find an employee by ID
 EmployeeProvider.prototype.findById = function(id, callback) {
-    this.getCollection(function(error, employee_collection) {
-      if( error ) callback(error)
-      else {
-        employee_collection.findOne({_id: employee_collection.db.bson_serializer.ObjectID.createFromHexString(id)}, function(error, result) {
-          if( error ) callback(error)
-          else callback(null, result)
-        });
-      }
-    });
+  this.getCollection(function(error, employee_collection) {
+    if (error) callback(error)
+    else {
+      employee_collection.findOne({
+        _id: employee_collection.db.bson_serializer.ObjectID.createFromHexString(id)
+      }, (error, result) => {
+        if (error) callback(error);
+        else callback(null, result);
+      });
+    }
+  });
 };
 
 
-//save new employee
+// save new employee
 EmployeeProvider.prototype.save = function(employees, callback) {
-    this.getCollection(function(error, employee_collection) {
-      if( error ) callback(error)
-      else {
-        if( typeof(employees.length)=="undefined")
-          employees = [employees];
+  this.getCollection(function(error, employee_collection) {
+    if (error) callback(error)
+    else {
+      if (typeof(employees.length) === "undefined")
+        employees = [employees];
 
-        for( var i =0;i< employees.length;i++ ) {
-          employee = employees[i];
-          employee.created_at = new Date();
-        }
-
-        employee_collection.insert(employees, function() {
-          callback(null, employees);
-        });
+      for (var i = 0;i < employees.length; i++) {
+        employee = employees[i];
+        employee.created_at = new Date();
       }
-    });
+
+      employee_collection.insert(employees, () => {
+        callback(null, employees);
+      });
+    }
+  });
 };
 
 // update an employee
 EmployeeProvider.prototype.update = function(employeeId, employees, callback) {
-    this.getCollection(function(error, employee_collection) {
-      if( error ) callback(error);
-      else {
-        employee_collection.update(
-					{_id: employee_collection.db.bson_serializer.ObjectID.createFromHexString(employeeId)},
-					employees,
-					function(error, employees) {
-						if(error) callback(error);
-						else callback(null, employees)       
-					});
-      }
-    });
+  this.getCollection(function(error, employee_collection) {
+    if (error) callback(error);
+    else {
+      employee_collection.update({
+        _id: employee_collection.db.bson_serializer.ObjectID.createFromHexString(employeeId)
+      }, employees, (error, employees) => {
+        if (error) callback(error);
+        else callback(null, employees);
+      });
+    }
+  });
 };
 
-//delete employee
+// delete employee
 EmployeeProvider.prototype.delete = function(employeeId, callback) {
 	this.getCollection(function(error, employee_collection) {
-		if(error) callback(error);
+		if (error) callback(error);
 		else {
-			employee_collection.remove(
-				{_id: employee_collection.db.bson_serializer.ObjectID.createFromHexString(employeeId)},
-				function(error, employee){
-					if(error) callback(error);
-					else callback(null, employee)
-				});
-			}
+			employee_collection.remove({
+        _id: employee_collection.db.bson_serializer.ObjectID.createFromHexString(employeeId)
+      }, (error, employee) => {
+        if (error) callback(error);
+        else callback(null, employee)
+      });
+    }
 	});
 };
 
