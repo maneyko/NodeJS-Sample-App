@@ -14,7 +14,7 @@ var app = express();
 app.configure(() => {
   app.set('port', process.env.PORT || 3000);
   app.set('views', __dirname + '/views');
-  app.set('view engine', 'jade');
+  app.set('view engine', 'pug');
   app.set('view options', {layout: false});
   app.use(express.favicon());
   app.use(express.logger('dev'));
